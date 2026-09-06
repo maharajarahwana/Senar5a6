@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Latihan Membaca Not</title>
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    canvas {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+    }
+
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas" width="500" height="300"></canvas>
+
+<script>
+
+// =====================================================
+// DAFTAR NADA
+// =====================================================
+
+const nada = [
+
+    // Senar 6
+
+    // E senar 6 fret 0
+    {
+        nama: "E",
+        frekuensi: 82.41
+    },
+
+    // F senar 6 fret 1
+    {
+        nama: "F",
+        frekuensi: 87.31
+    },
+
+    // G senar 6 fret 3
+    {
+        nama: "G",
+        frekuensi: 98.00
+    },
+
+    // Senar 5
+
+    // A senar 5 fret 0
+    {
+        nama: "A",
+        frekuensi: 110.00
+    },
+
+    // B senar 5 fret 2
+    {
+        nama: "B",
+        frekuensi: 123.47
+    },
+
+    // C senar 5 fret 3
+    {
+        nama: "C",
+        frekuensi: 130.81
+    },
+
+    // D senar 5 fret 5
+    {
+        nama: "D",
+        frekuensi: 146.83
+    }
+
+];
+
+
+// =====================================================
+// CANVAS
+// =====================================================
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+let target;
+
+
+// =====================================================
+// NOT SEBELUMNYA
+// =====================================================
+
+let notSebelumnya = null;
+
+
+// =====================================================
+// PILIH NOT RANDOM
+// =====================================================
+
+function pilihNot() {
+
+    let pilihan;
+
+    do {
+
+        pilihan =
+            nada[
+                Math.floor(
+                    Math.random() * nada.length
+                )
+            ];
+
+    } while (
+        nada.length > 1 &&
+        pilihan.nama === notSebelumnya
+    );
+
+    target = pilihan;
+
+    notSebelumnya =
+        target.nama;
+
+    gambarNot();
+}
+
+
+// =====================================================
+// GAMBAR NOT
+// =====================================================
+
+function gambarNot() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    // -----------------------------
+    // PARANADA
+    // -----------------------------
+
+    const x1 = 100;
+    const x2 = 440;
+
+    const jarak = 30;
+
+    const garisTengah = 150;
+
+
+    for (
+        let i = -2;
+        i <= 2;
+        i++
+    ) {
+
+        const y =
+            garisTengah +
+            i * jarak;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x1,
+            y
+        );
+
+        ctx.lineTo(
+            x2,
+            y
+        );
+
+
+        ctx.strokeStyle =
+            "black";
+
+        ctx.lineWidth =
+            3;
+
+        ctx.stroke();
+
+    }
+
+
+    // -----------------------------
+    // KUNCI G
+    // -----------------------------
+
+    ctx.font =
+        "115px serif";
+
+    ctx.fillStyle =
+        "black";
+
+
+    ctx.fillText(
+        "𝄞",
+        35,
+        185
+    );
+
+
+    // -----------------------------
+    // POSISI NOT
+    // -----------------------------
+    //
+    // E = spasi bawah
+    // F = garis bantu 3
+    // G = spasi
+    // A = garis bantu 2
+    // B = spasi
+    // C = garis bantu 1
+    // D = spasi
+    //
+
+    const posisi = {
+
+        "E": 225,
+
+        "F": 210,
+
+        "G": 195,
+
+        "A": 180,
+
+        "B": 165,
+
+        "C": 150,
+
+        "D": 135
+
+    };
+
+
+    const y =
+        posisi[target.nama];
+
+    const x = 270;
+
+
+    // -----------------------------
+    // GARIS BANTU
+    // -----------------------------
+    //
+    // F = garis bantu 3
+    // A = garis bantu 2
+    // C = garis bantu 1
+    //
+
+    if (
+        target.nama === "F" ||
+        target.nama === "A" ||
+        target.nama === "C"
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x - 35,
+            y
+        );
+
+        ctx.lineTo(
+            x + 35,
+            y
+        );
+
+
+        ctx.strokeStyle =
+            "black";
+
+        ctx.lineWidth =
+            3;
+
+        ctx.stroke();
+
+    }
+
+
+    // -----------------------------
+    // KEPALA NOT
+    // -----------------------------
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x,
+        y,
+        17,
+        12,
+        -0.3,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    // -----------------------------
+    // BATANG NOT
+    // -----------------------------
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x + 15,
+        y
+    );
+
+    ctx.lineTo(
+        x + 15,
+        y - 75
+    );
+
+    ctx.lineWidth =
+        4;
+
+    ctx.stroke();
+
+}
+
+
+// =====================================================
+// AUDIO
+// =====================================================
+
+let audioContext;
+
+let analyser;
+
+let microphone;
+
+let buffer;
+
+
+async function mulaiMikrofon() {
+
+    try {
+
+        const stream =
+            await navigator.mediaDevices
+            .getUserMedia({
+                audio: true
+            });
+
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+
+        microphone =
+            audioContext
+            .createMediaStreamSource(
+                stream
+            );
+
+
+        analyser =
+            audioContext
+            .createAnalyser();
+
+
+        analyser.fftSize =
+            4096;
+
+
+        microphone.connect(
+            analyser
+        );
+
+
+        buffer =
+            new Float32Array(
+                analyser.fftSize
+            );
+
+
+        deteksiNada();
+
+    }
+
+    catch (error) {
+
+        console.log(error);
+
+
+        document.body.innerHTML =
+            "<h2>Izinkan akses mikrofon</h2>";
+
+    }
+
+}
+
+
+// =====================================================
+// DETEKSI NADA
+// =====================================================
+
+function deteksiNada() {
+
+    analyser.getFloatTimeDomainData(
+        buffer
+    );
+
+
+    const frekuensi =
+        cariFrekuensi(
+            buffer,
+            audioContext.sampleRate
+        );
+
+
+    if (
+        frekuensi > 0
+    ) {
+
+        cekNada(
+            frekuensi
+        );
+
+    }
+
+
+    requestAnimationFrame(
+        deteksiNada
+    );
+
+}
+
+
+// =====================================================
+// CARI FREKUENSI
+// =====================================================
+
+function cariFrekuensi(
+    buffer,
+    sampleRate
+) {
+
+    let rms = 0;
+
+
+    for (
+        let i = 0;
+        i < buffer.length;
+        i++
+    ) {
+
+        rms +=
+            buffer[i] *
+            buffer[i];
+
+    }
+
+
+    rms =
+        Math.sqrt(
+            rms /
+            buffer.length
+        );
+
+
+    if (
+        rms < 0.015
+    ) {
+
+        return -1;
+
+    }
+
+
+    let bestOffset =
+        -1;
+
+    let bestCorrelation =
+        0;
+
+
+    for (
+        let offset = 20;
+        offset < 1000;
+        offset++
+    ) {
+
+        let correlation =
+            0;
+
+
+        for (
+            let i = 0;
+            i < buffer.length - offset;
+            i++
+        ) {
+
+            correlation +=
+                buffer[i] *
+                buffer[i + offset];
+
+        }
+
+
+        correlation /=
+            buffer.length - offset;
+
+
+        if (
+            correlation >
+            bestCorrelation
+        ) {
+
+            bestCorrelation =
+                correlation;
+
+            bestOffset =
+                offset;
+
+        }
+
+    }
+
+
+    if (
+        bestOffset === -1
+    ) {
+
+        return -1;
+
+    }
+
+
+    return (
+        sampleRate /
+        bestOffset
+    );
+
+}
+
+
+// =====================================================
+// CEK NADA
+// =====================================================
+
+let waktuTerakhir =
+    0;
+
+
+function cekNada(freq) {
+
+    const sekarang =
+        Date.now();
+
+
+    // Mencegah satu petikan
+    // terbaca berkali-kali
+
+    if (
+        sekarang -
+        waktuTerakhir <
+        500
+    ) {
+
+        return;
+
+    }
+
+
+    let terdekat =
+        null;
+
+    let selisihTerkecil =
+        Infinity;
+
+
+    for (
+        const n of nada
+    ) {
+
+        const selisih =
+            Math.abs(
+                freq -
+                n.frekuensi
+            );
+
+
+        if (
+            selisih <
+            selisihTerkecil
+        ) {
+
+            selisihTerkecil =
+                selisih;
+
+            terdekat =
+                n;
+
+        }
+
+    }
+
+
+    // -----------------------------
+    // TOLERANSI 2,5%
+    // -----------------------------
+
+    if (
+        terdekat &&
+        selisihTerkecil /
+        terdekat.frekuensi <
+        0.025
+    ) {
+
+        waktuTerakhir =
+            sekarang;
+
+
+        // -------------------------
+        // JIKA BENAR
+        // -------------------------
+
+        if (
+            terdekat.nama ===
+            target.nama
+        ) {
+
+            pilihNot();
+
+        }
+
+
+        // -------------------------
+        // JIKA SALAH
+        // -------------------------
+
+        else {
+
+            // Not tetap ditampilkan.
+
+        }
+
+    }
+
+}
+
+
+// =====================================================
+// MULAI OTOMATIS
+// =====================================================
+
+pilihNot();
+
+mulaiMikrofon();
+
+</script>
+
+</body>
+</html>
