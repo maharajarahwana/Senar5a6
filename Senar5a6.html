@@ -4,681 +4,478 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Latihan Membaca Not</title>
+<title>senar5&6</title>
 
 <style>
-
-    * {
-        box-sizing: border-box;
-    }
-
-    html, body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-    }
-
     body {
-        font-family: Arial, sans-serif;
+        margin: 0;
         background: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
+        font-family: Arial, sans-serif;
+        text-align: center;
     }
 
-    canvas {
+    h2 {
+        margin: 15px 0 5px;
+    }
+
+    #namaNot {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    svg {
         width: 100%;
-        max-width: 500px;
-        height: auto;
+        max-width: 900px;
+        height: 330px;
+        display: block;
+        margin: auto;
     }
 
+    .garis {
+        stroke: black;
+        stroke-width: 2;
+    }
+
+    .garis-bantu {
+        stroke: black;
+        stroke-width: 2;
+    }
+
+    .kepala-not {
+        fill: black;
+    }
+
+    .batang-not {
+        stroke: black;
+        stroke-width: 2;
+    }
+
+    .clef {
+        font-size: 115px;
+        font-family: "Times New Roman", serif;
+    }
 </style>
 </head>
 
 <body>
 
-<canvas id="canvas" width="500" height="300"></canvas>
+<h2>Latihan Membaca Not Gitar</h2>
+<div id="namaNot"></div>
+
+<svg id="notasi"
+     viewBox="0 0 900 330"
+     preserveAspectRatio="xMidYMid meet">
+
+    <!-- 5 garis paranada -->
+    <line class="garis" x1="70" y1="80"  x2="850" y2="80"/>
+    <line class="garis" x1="70" y1="96"  x2="850" y2="96"/>
+    <line class="garis" x1="70" y1="112" x2="850" y2="112"/>
+    <line class="garis" x1="70" y1="128" x2="850" y2="128"/>
+    <line class="garis" x1="70" y1="144" x2="850" y2="144"/>
+
+    <!-- Kunci G -->
+    <text x="35" y="158" class="clef">𝄞</text>
+
+    <!-- tempat not akan digambar -->
+    <g id="not"></g>
+
+</svg>
+
 
 <script>
 
-// =====================================================
-// DAFTAR NADA
-// =====================================================
-
 const nada = [
 
-    // Senar 6
-
-    // E senar 6 fret 0
     {
         nama: "E",
-        frekuensi: 82.41
+        frekuensi: 82.41,
+        senar: 6,
+        fret: 0,
+
+        // Spasi di bawah garis bantu ke-3
+        y: 256,
+
+        // 3 garis bantu
+        garisBantu: [208, 224, 240]
     },
 
-    // F senar 6 fret 1
     {
         nama: "F",
-        frekuensi: 87.31
+        frekuensi: 87.31,
+        senar: 6,
+        fret: 1,
+
+        // Garis bantu ke-3
+        y: 240,
+
+        garisBantu: [208, 224, 240]
     },
 
-    // G senar 6 fret 3
     {
         nama: "G",
-        frekuensi: 98.00
+        frekuensi: 98.00,
+        senar: 6,
+        fret: 3,
+
+        // Spasi antara garis bantu ke-2 dan ke-3
+        y: 224,
+
+        garisBantu: [208, 224]
     },
 
-    // Senar 5
-
-    // A senar 5 fret 0
     {
         nama: "A",
-        frekuensi: 110.00
+        frekuensi: 110.00,
+        senar: 5,
+        fret: 0,
+
+        // Garis bantu ke-2
+        y: 208,
+
+        garisBantu: [208, 224]
     },
 
-    // B senar 5 fret 2
     {
         nama: "B",
-        frekuensi: 123.47
+        frekuensi: 123.47,
+        senar: 5,
+        fret: 2,
+
+        // Spasi antara garis bantu ke-1 dan ke-2
+        y: 192,
+
+        garisBantu: [208]
     },
 
-    // C senar 5 fret 3
     {
         nama: "C",
-        frekuensi: 130.81
+        frekuensi: 130.81,
+        senar: 5,
+        fret: 3,
+
+        // Garis bantu ke-1
+        y: 176,
+
+        garisBantu: [176]
     },
 
-    // D senar 5 fret 5
     {
         nama: "D",
-        frekuensi: 146.83
+        frekuensi: 146.83,
+        senar: 5,
+        fret: 5,
+
+        // Spasi tepat di bawah garis paranada
+        y: 160,
+
+        garisBantu: []
     }
 
 ];
 
 
-// =====================================================
-// CANVAS
-// =====================================================
-
-const canvas =
-    document.getElementById("canvas");
-
-const ctx =
-    canvas.getContext("2d");
-
-let target;
-
-
-// =====================================================
-// NOT SEBELUMNYA
-// =====================================================
-
 let notSebelumnya = null;
 
 
-// =====================================================
-// PILIH NOT RANDOM
-// =====================================================
+// ===============================
+// MEMILIH NOT ACAK
+// ===============================
 
 function pilihNot() {
 
-    let pilihan;
+    let notBaru;
 
     do {
-
-        pilihan =
-            nada[
-                Math.floor(
-                    Math.random() * nada.length
-                )
-            ];
+        const index = Math.floor(Math.random() * nada.length);
+        notBaru = nada[index];
 
     } while (
         nada.length > 1 &&
-        pilihan.nama === notSebelumnya
+        notBaru.nama === notSebelumnya
     );
 
-    target = pilihan;
+    notSebelumnya = notBaru.nama;
 
-    notSebelumnya =
-        target.nama;
-
-    gambarNot();
+    gambarNot(notBaru);
 }
 
 
-// =====================================================
-// GAMBAR NOT
-// =====================================================
+// ===============================
+// MENGGAMBAR NOT
+// ===============================
 
-function gambarNot() {
+function gambarNot(not) {
 
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+    const group = document.getElementById("not");
 
+    // Hapus not sebelumnya
+    group.innerHTML = "";
 
-    // -----------------------------
-    // PARANADA
-    // -----------------------------
+    const x = 500;
+    const y = not.y;
 
-    const x1 = 100;
-    const x2 = 440;
-
-    const jarak = 30;
-
-    const garisTengah = 150;
-
-
-    for (
-        let i = -2;
-        i <= 2;
-        i++
-    ) {
-
-        const y =
-            garisTengah +
-            i * jarak;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x1,
-            y
-        );
-
-        ctx.lineTo(
-            x2,
-            y
-        );
-
-
-        ctx.strokeStyle =
-            "black";
-
-        ctx.lineWidth =
-            3;
-
-        ctx.stroke();
-
-    }
-
-
-    // -----------------------------
-    // KUNCI G
-    // -----------------------------
-
-    ctx.font =
-        "115px serif";
-
-    ctx.fillStyle =
-        "black";
-
-
-    ctx.fillText(
-        "𝄞",
-        35,
-        185
-    );
-
-
-    // -----------------------------
-    // POSISI NOT
-    // -----------------------------
-    //
-    // E = spasi bawah
-    // F = garis bantu 3
-    // G = spasi
-    // A = garis bantu 2
-    // B = spasi
-    // C = garis bantu 1
-    // D = spasi
-    //
-
-    const posisi = {
-
-        "E": 225,
-
-        "F": 210,
-
-        "G": 195,
-
-        "A": 180,
-
-        "B": 165,
-
-        "C": 150,
-
-        "D": 135
-
-    };
-
-
-    const y =
-        posisi[target.nama];
-
-    const x = 270;
-
-
-    // -----------------------------
+    // ===========================
     // GARIS BANTU
-    // -----------------------------
-    //
-    // F = garis bantu 3
-    // A = garis bantu 2
-    // C = garis bantu 1
-    //
+    // ===========================
 
-    if (
-        target.nama === "F" ||
-        target.nama === "A" ||
-        target.nama === "C"
-    ) {
+    not.garisBantu.forEach(function(gy) {
 
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x - 35,
-            y
+        const garis = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
         );
 
-        ctx.lineTo(
-            x + 35,
-            y
-        );
+        garis.setAttribute("x1", x - 30);
+        garis.setAttribute("x2", x + 30);
+        garis.setAttribute("y1", gy);
+        garis.setAttribute("y2", gy);
+        garis.setAttribute("class", "garis-bantu");
+
+        group.appendChild(garis);
+    });
 
 
-        ctx.strokeStyle =
-            "black";
-
-        ctx.lineWidth =
-            3;
-
-        ctx.stroke();
-
-    }
-
-
-    // -----------------------------
+    // ===========================
     // KEPALA NOT
-    // -----------------------------
+    // ===========================
 
-    ctx.beginPath();
-
-    ctx.ellipse(
-        x,
-        y,
-        17,
-        12,
-        -0.3,
-        0,
-        Math.PI * 2
+    const kepala = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "ellipse"
     );
 
-    ctx.fill();
+    kepala.setAttribute("cx", x);
+    kepala.setAttribute("cy", y);
+    kepala.setAttribute("rx", 14);
+    kepala.setAttribute("ry", 10);
+    kepala.setAttribute("class", "kepala-not");
+
+    // Sedikit dimiringkan seperti not asli
+    kepala.setAttribute(
+        "transform",
+        `rotate(-20 ${x} ${y})`
+    );
+
+    group.appendChild(kepala);
 
 
-    // -----------------------------
+    // ===========================
     // BATANG NOT
-    // -----------------------------
+    // ===========================
 
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x + 15,
-        y
+    const batang = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
     );
 
-    ctx.lineTo(
-        x + 15,
-        y - 75
-    );
+    batang.setAttribute("x1", x + 11);
+    batang.setAttribute("x2", x + 11);
+    batang.setAttribute("y1", y);
+    batang.setAttribute("y2", y - 75);
+    batang.setAttribute("class", "batang-not");
 
-    ctx.lineWidth =
-        4;
-
-    ctx.stroke();
-
+    group.appendChild(batang);
 }
 
 
-// =====================================================
-// AUDIO
-// =====================================================
-
-let audioContext;
+// ===============================
+// MIKROFON
+// ===============================
 
 let analyser;
+let dataArray;
 
-let microphone;
+navigator.mediaDevices.getUserMedia({
+    audio: true
+})
+.then(function(stream) {
 
-let buffer;
+    const audioContext =
+        new (window.AudioContext ||
+             window.webkitAudioContext)();
 
+    const source =
+        audioContext.createMediaStreamSource(stream);
 
-async function mulaiMikrofon() {
+    analyser = audioContext.createAnalyser();
 
-    try {
+    analyser.fftSize = 4096;
 
-        const stream =
-            await navigator.mediaDevices
-            .getUserMedia({
-                audio: true
-            });
+    source.connect(analyser);
 
+    dataArray =
+        new Float32Array(analyser.fftSize);
 
-        audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
+    deteksiNada();
 
+})
+.catch(function(error) {
 
-        microphone =
-            audioContext
-            .createMediaStreamSource(
-                stream
-            );
+    document.body.innerHTML =
+        "<h2>Izinkan akses mikrofon untuk menggunakan latihan ini.</h2>";
 
-
-        analyser =
-            audioContext
-            .createAnalyser();
+});
 
 
-        analyser.fftSize =
-            4096;
+// ===============================
+// DETEKSI FREKUENSI
+// ===============================
 
-
-        microphone.connect(
-            analyser
-        );
-
-
-        buffer =
-            new Float32Array(
-                analyser.fftSize
-            );
-
-
-        deteksiNada();
-
-    }
-
-    catch (error) {
-
-        console.log(error);
-
-
-        document.body.innerHTML =
-            "<h2>Izinkan akses mikrofon</h2>";
-
-    }
-
-}
-
-
-// =====================================================
-// DETEKSI NADA
-// =====================================================
+let waktuTerakhir = 0;
 
 function deteksiNada() {
 
-    analyser.getFloatTimeDomainData(
-        buffer
-    );
+    requestAnimationFrame(deteksiNada);
 
+    if (!analyser) return;
 
-    const frekuensi =
-        cariFrekuensi(
-            buffer,
-            audioContext.sampleRate
-        );
+    analyser.getFloatTimeDomainData(dataArray);
 
+    // ---------------------------
+    // Hitung RMS
+    // ---------------------------
 
-    if (
-        frekuensi > 0
-    ) {
+    let jumlah = 0;
 
-        cekNada(
-            frekuensi
-        );
+    for (let i = 0; i < dataArray.length; i++) {
+        jumlah += dataArray[i] * dataArray[i];
+    }
 
+    const rms =
+        Math.sqrt(jumlah / dataArray.length);
+
+    // Abaikan suara terlalu kecil
+    if (rms < 0.015) {
+        return;
     }
 
 
-    requestAnimationFrame(
-        deteksiNada
-    );
+    // ---------------------------
+    // Autocorrelation
+    // ---------------------------
 
-}
+    let terbaik = 0;
+    let nilaiTerbaik = 0;
 
+    for (let offset = 20; offset < 1000; offset++) {
 
-// =====================================================
-// CARI FREKUENSI
-// =====================================================
-
-function cariFrekuensi(
-    buffer,
-    sampleRate
-) {
-
-    let rms = 0;
-
-
-    for (
-        let i = 0;
-        i < buffer.length;
-        i++
-    ) {
-
-        rms +=
-            buffer[i] *
-            buffer[i];
-
-    }
-
-
-    rms =
-        Math.sqrt(
-            rms /
-            buffer.length
-        );
-
-
-    if (
-        rms < 0.015
-    ) {
-
-        return -1;
-
-    }
-
-
-    let bestOffset =
-        -1;
-
-    let bestCorrelation =
-        0;
-
-
-    for (
-        let offset = 20;
-        offset < 1000;
-        offset++
-    ) {
-
-        let correlation =
-            0;
-
+        let korelasi = 0;
 
         for (
             let i = 0;
-            i < buffer.length - offset;
+            i < dataArray.length - offset;
             i++
         ) {
-
-            correlation +=
-                buffer[i] *
-                buffer[i + offset];
-
+            korelasi +=
+                dataArray[i] *
+                dataArray[i + offset];
         }
 
+        if (korelasi > nilaiTerbaik) {
 
-        correlation /=
-            buffer.length - offset;
-
-
-        if (
-            correlation >
-            bestCorrelation
-        ) {
-
-            bestCorrelation =
-                correlation;
-
-            bestOffset =
-                offset;
+            nilaiTerbaik = korelasi;
+            terbaik = offset;
 
         }
-
     }
 
 
-    if (
-        bestOffset === -1
-    ) {
-
-        return -1;
-
-    }
-
-
-    return (
-        sampleRate /
-        bestOffset
-    );
-
-}
-
-
-// =====================================================
-// CEK NADA
-// =====================================================
-
-let waktuTerakhir =
-    0;
-
-
-function cekNada(freq) {
-
-    const sekarang =
-        Date.now();
-
-
-    // Mencegah satu petikan
-    // terbaca berkali-kali
-
-    if (
-        sekarang -
-        waktuTerakhir <
-        500
-    ) {
-
+    if (terbaik === 0) {
         return;
-
     }
 
 
-    let terdekat =
-        null;
-
-    let selisihTerkecil =
-        Infinity;
+    const frekuensi =
+        analyser.context.sampleRate / terbaik;
 
 
-    for (
-        const n of nada
-    ) {
+    // ---------------------------
+    // Cari not terdekat
+    // ---------------------------
+
+    let notTerdekat = null;
+    let selisihTerkecil = Infinity;
+
+    nada.forEach(function(not) {
 
         const selisih =
-            Math.abs(
-                freq -
-                n.frekuensi
-            );
+            Math.abs(frekuensi - not.frekuensi);
 
+        if (selisih < selisihTerkecil) {
 
-        if (
-            selisih <
-            selisihTerkecil
-        ) {
-
-            selisihTerkecil =
-                selisih;
-
-            terdekat =
-                n;
+            selisihTerkecil = selisih;
+            notTerdekat = not;
 
         }
+    });
 
+
+    if (!notTerdekat) {
+        return;
     }
 
 
-    // -----------------------------
-    // TOLERANSI 2,5%
-    // -----------------------------
+    // ---------------------------
+    // Toleransi 2,5%
+    // ---------------------------
+
+    const error =
+        Math.abs(
+            frekuensi - notTerdekat.frekuensi
+        ) / notTerdekat.frekuensi;
+
+
+    if (error > 0.025) {
+        return;
+    }
+
+
+    // ---------------------------
+    // Jangan membaca satu petikan
+    // berkali-kali
+    // ---------------------------
+
+    const sekarang = Date.now();
+
+    if (sekarang - waktuTerakhir < 500) {
+        return;
+    }
+
+
+    waktuTerakhir = sekarang;
+
+
+    // ---------------------------
+    // Cek jawaban
+    // ---------------------------
+
+    const notSekarang =
+        nada.find(function(n) {
+            return n.nama === notSebelumnya;
+        });
+
 
     if (
-        terdekat &&
-        selisihTerkecil /
-        terdekat.frekuensi <
-        0.025
+        notSekarang &&
+        notTerdekat.nama === notSekarang.nama
     ) {
 
-        waktuTerakhir =
-            sekarang;
+        // BENAR
+        // Langsung ganti not
 
-
-        // -------------------------
-        // JIKA BENAR
-        // -------------------------
-
-        if (
-            terdekat.nama ===
-            target.nama
-        ) {
-
-            pilihNot();
-
-        }
-
-
-        // -------------------------
-        // JIKA SALAH
-        // -------------------------
-
-        else {
-
-            // Not tetap ditampilkan.
-
-        }
+        pilihNot();
 
     }
 
 }
 
 
-// =====================================================
-// MULAI OTOMATIS
-// =====================================================
+// ===============================
+// MULAI DENGAN NOT ACAK
+// ===============================
 
 pilihNot();
-
-mulaiMikrofon();
 
 </script>
 
