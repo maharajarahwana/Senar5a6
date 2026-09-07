@@ -97,8 +97,6 @@ const ctx =
 
 let target;
 
-
-// Menyimpan not sebelumnya
 let notSebelumnya = null;
 
 
@@ -146,9 +144,9 @@ function gambarNot() {
     );
 
 
-    // -----------------------------
+    // =================================================
     // PARANADA
-    // -----------------------------
+    // =================================================
 
     const x1 = 100;
     const x2 = 440;
@@ -188,9 +186,9 @@ function gambarNot() {
     }
 
 
-    // -----------------------------
+    // =================================================
     // KUNCI G
-    // -----------------------------
+    // =================================================
 
     ctx.font = "115px serif";
 
@@ -203,28 +201,25 @@ function gambarNot() {
     );
 
 
-    // -----------------------------
+    // =================================================
     // POSISI NOT
-    // -----------------------------
+    // =================================================
     //
-    // Garis paranada:
+    // D = spasi
+    // C = 1 garis di atas B/A
+    // B = spasi
+    // A = 1 garis di atas G/F
+    // G = spasi
+    // F = 1 garis di atas E
+    // E = spasi
     //
-    // 60
-    // 90
-    // 120
-    // 150
-    // 180
+    // Garis bantu:
     //
-    // Jarak antar posisi not = 15 px
+    // C = 210
+    // A = 240
+    // F = 270
     //
-    // D = spasi di bawah garis bawah
-    // C = garis bantu 1
-    // B = spasi di bawah C
-    // A = garis bantu 2
-    // G = spasi di bawah A
-    // F = garis bantu 3
-    // E = spasi di bawah F
-    // -----------------------------
+    // =================================================
 
     const posisi = {
 
@@ -251,30 +246,72 @@ function gambarNot() {
     const x = 270;
 
 
-    // -----------------------------
-    // GARIS BANTU
-    // -----------------------------
+    // =================================================
+    // GARIS BANTU DI ATAS NOT
+    // =================================================
+    //
+    // B → 1 garis: C
+    // A → 1 garis: C
+    //
+    // G → 2 garis: C, A
+    // F → 2 garis: C, A
+    //
+    // E → 3 garis: C, A, F
+    //
+    // D → tidak ada garis bantu
+    //
+    // =================================================
 
-    // C = garis bantu 1
-    // A = garis bantu 2
-    // F = garis bantu 3
+    let garisBantu = [];
 
-    if (
-        target.nama === "C" ||
-        target.nama === "A" ||
-        target.nama === "F"
-    ) {
+
+    if (target.nama === "B") {
+
+        garisBantu = [210];
+
+    }
+
+    else if (target.nama === "A") {
+
+        garisBantu = [210];
+
+    }
+
+    else if (target.nama === "G") {
+
+        garisBantu = [210, 240];
+
+    }
+
+    else if (target.nama === "F") {
+
+        garisBantu = [210, 240];
+
+    }
+
+    else if (target.nama === "E") {
+
+        garisBantu = [210, 240, 270];
+
+    }
+
+
+    // =================================================
+    // GAMBAR GARIS BANTU
+    // =================================================
+
+    garisBantu.forEach(function(gy) {
 
         ctx.beginPath();
 
         ctx.moveTo(
             x - 35,
-            y
+            gy
         );
 
         ctx.lineTo(
             x + 35,
-            y
+            gy
         );
 
         ctx.strokeStyle = "black";
@@ -282,12 +319,13 @@ function gambarNot() {
         ctx.lineWidth = 3;
 
         ctx.stroke();
-    }
+
+    });
 
 
-    // -----------------------------
+    // =================================================
     // KEPALA NOT
-    // -----------------------------
+    // =================================================
 
     ctx.beginPath();
 
@@ -304,9 +342,9 @@ function gambarNot() {
     ctx.fill();
 
 
-    // -----------------------------
+    // =================================================
     // BATANG NOT
-    // -----------------------------
+    // =================================================
 
     ctx.beginPath();
 
@@ -515,6 +553,7 @@ function cariFrekuensi(
                 offset;
 
         }
+
     }
 
 
@@ -589,12 +628,13 @@ function cekNada(freq) {
             terdekat = n;
 
         }
+
     }
 
 
-    // -----------------------------
+    // =================================================
     // TOLERANSI 2,5%
-    // -----------------------------
+    // =================================================
 
     if (
         terdekat &&
@@ -607,9 +647,9 @@ function cekNada(freq) {
             sekarang;
 
 
-        // -------------------------
+        // -----------------------------
         // JIKA BENAR
-        // -------------------------
+        // -----------------------------
 
         if (
             terdekat.nama ===
@@ -621,16 +661,18 @@ function cekNada(freq) {
         }
 
 
-        // -------------------------
+        // -----------------------------
         // JIKA SALAH
-        // -------------------------
+        // -----------------------------
 
         else {
 
             // Not tetap ditampilkan.
 
         }
+
     }
+
 }
 
 
