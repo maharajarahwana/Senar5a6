@@ -204,16 +204,6 @@ function gambarNot() {
     // =================================================
     // POSISI NOT
     // =================================================
-    //
-    // D = spasi di bawah garis bawah
-    // C = tepat pada garis bantu 1
-    // B = spasi di bawah C
-    // A = tepat pada garis bantu 2
-    // G = spasi di bawah A
-    // F = tepat pada garis bantu 3
-    // E = spasi di bawah F
-    //
-    // =================================================
 
     const posisi = {
 
@@ -239,23 +229,32 @@ function gambarNot() {
     // =================================================
     //
     // C:
-    //    garis tepat pada C
-    //
-    // A:
-    //    garis tepat pada A
-    //
-    // F:
-    //    garis tepat pada F
-    //    + garis A dan C di atasnya
+    //    1 garis, tepat pada C
     //
     // B:
-    //    garis C di atasnya
+    //    1 garis di atasnya, yaitu C
+    //
+    // A:
+    //    2 garis terlihat:
+    //    - garis A, tempat not
+    //    - garis C di atasnya
     //
     // G:
-    //    garis A dan C di atasnya
+    //    2 garis di atasnya:
+    //    - A
+    //    - C
+    //
+    // F:
+    //    3 garis terlihat:
+    //    - F, tempat not
+    //    - A
+    //    - C
     //
     // E:
-    //    garis F, A dan C di atasnya
+    //    3 garis di atasnya:
+    //    - F
+    //    - A
+    //    - C
     //
     // D:
     //    tidak ada garis bantu
@@ -267,7 +266,7 @@ function gambarNot() {
 
     if (target.nama === "C") {
 
-        // C tepat pada garis bantu C
+        // C tepat pada garis C
         garisBantu = [210];
 
     }
@@ -281,8 +280,9 @@ function gambarNot() {
 
     else if (target.nama === "A") {
 
-        // A tepat pada garis bantu A
-        garisBantu = [240];
+        // A tepat pada garis A
+        // C berada di atas A
+        garisBantu = [210, 240];
 
     }
 
@@ -295,7 +295,7 @@ function gambarNot() {
 
     else if (target.nama === "F") {
 
-        // F tepat pada garis bantu F
+        // F tepat pada garis F
         // A dan C berada di atas F
         garisBantu = [210, 240, 270];
 
@@ -598,9 +598,6 @@ function cekNada(freq) {
     const sekarang =
         Date.now();
 
-
-    // Mencegah satu petikan
-    // terbaca berkali-kali
 
     if (
         sekarang -
