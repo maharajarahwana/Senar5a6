@@ -205,36 +205,24 @@ function gambarNot() {
     // POSISI NOT
     // =================================================
     //
-    // D = spasi
-    // C = 1 garis di atas B/A
+    // D = spasi di bawah garis paranada
+    // C = garis bantu 1
     // B = spasi
-    // A = 1 garis di atas G/F
+    // A = garis bantu 2
     // G = spasi
-    // F = 1 garis di atas E
+    // F = garis bantu 3
     // E = spasi
-    //
-    // Garis bantu:
-    //
-    // C = 210
-    // A = 240
-    // F = 270
     //
     // =================================================
 
     const posisi = {
 
         "D": 195,
-
         "C": 210,
-
         "B": 225,
-
         "A": 240,
-
         "G": 255,
-
         "F": 270,
-
         "E": 285
 
     };
@@ -247,50 +235,65 @@ function gambarNot() {
 
 
     // =================================================
-    // GARIS BANTU DI ATAS NOT
+    // GARIS BANTU
     // =================================================
     //
-    // B → 1 garis: C
-    // A → 1 garis: C
+    // C = garis bantu 1
+    // A = garis bantu 2
+    // F = garis bantu 3
     //
-    // G → 2 garis: C, A
-    // F → 2 garis: C, A
+    // C, A, F mempunyai garis tepat pada posisi
+    // kepala not karena not tersebut berada di garis.
     //
-    // E → 3 garis: C, A, F
+    // B = garis C di atasnya
+    // G = garis C dan A di atasnya
+    // E = garis C, A dan F di atasnya
     //
-    // D → tidak ada garis bantu
+    // D = tidak ada garis bantu
     //
     // =================================================
 
     let garisBantu = [];
 
 
-    if (target.nama === "B") {
+    if (target.nama === "C") {
 
+        // Garis tepat pada C
         garisBantu = [210];
 
     }
 
     else if (target.nama === "A") {
 
+        // Garis tepat pada A
+        garisBantu = [240];
+
+    }
+
+    else if (target.nama === "F") {
+
+        // Garis tepat pada F
+        garisBantu = [270];
+
+    }
+
+    else if (target.nama === "B") {
+
+        // Garis C berada di atas B
         garisBantu = [210];
 
     }
 
     else if (target.nama === "G") {
 
-        garisBantu = [210, 240];
-
-    }
-
-    else if (target.nama === "F") {
-
+        // Garis C dan A berada di atas G
         garisBantu = [210, 240];
 
     }
 
     else if (target.nama === "E") {
 
+        // Garis C, A dan F berada di atas E
         garisBantu = [210, 240, 270];
 
     }
