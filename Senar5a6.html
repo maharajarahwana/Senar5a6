@@ -3,479 +3,644 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>senar5&6</title>
+<title>senar6&5</title>
 
 <style>
-    body {
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
         margin: 0;
-        background: white;
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
-
-    h2 {
-        margin: 15px 0 5px;
-    }
-
-    #namaNot {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-
-    svg {
         width: 100%;
-        max-width: 900px;
-        height: 330px;
-        display: block;
-        margin: auto;
+        height: 100%;
     }
 
-    .garis {
-        stroke: black;
-        stroke-width: 2;
+    body {
+        font-family: Arial, sans-serif;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
     }
 
-    .garis-bantu {
-        stroke: black;
-        stroke-width: 2;
-    }
-
-    .kepala-not {
-        fill: black;
-    }
-
-    .batang-not {
-        stroke: black;
-        stroke-width: 2;
-    }
-
-    .clef {
-        font-size: 115px;
-        font-family: "Times New Roman", serif;
+    canvas {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
     }
 </style>
 </head>
 
 <body>
 
-<h2>Latihan Membaca Not Gitar</h2>
-<div id="namaNot"></div>
-
-<svg id="notasi"
-     viewBox="0 0 900 330"
-     preserveAspectRatio="xMidYMid meet">
-
-    <!-- 5 garis paranada -->
-    <line class="garis" x1="70" y1="80"  x2="850" y2="80"/>
-    <line class="garis" x1="70" y1="96"  x2="850" y2="96"/>
-    <line class="garis" x1="70" y1="112" x2="850" y2="112"/>
-    <line class="garis" x1="70" y1="128" x2="850" y2="128"/>
-    <line class="garis" x1="70" y1="144" x2="850" y2="144"/>
-
-    <!-- Kunci G -->
-    <text x="35" y="158" class="clef">𝄞</text>
-
-    <!-- tempat not akan digambar -->
-    <g id="not"></g>
-
-</svg>
-
+<canvas id="canvas" width="500" height="300"></canvas>
 
 <script>
 
+// =====================================================
+// DAFTAR NADA
+// =====================================================
+
 const nada = [
 
+    // Senar 6
     {
         nama: "E",
-        frekuensi: 82.41,
-        senar: 6,
-        fret: 0,
-
-        // Spasi di bawah garis bantu ke-3
-        y: 256,
-
-        // 3 garis bantu
-        garisBantu: [208, 224, 240]
+        frekuensi: 82.41
     },
 
     {
         nama: "F",
-        frekuensi: 87.31,
-        senar: 6,
-        fret: 1,
-
-        // Garis bantu ke-3
-        y: 240,
-
-        garisBantu: [208, 224, 240]
+        frekuensi: 87.31
     },
 
     {
         nama: "G",
-        frekuensi: 98.00,
-        senar: 6,
-        fret: 3,
-
-        // Spasi antara garis bantu ke-2 dan ke-3
-        y: 224,
-
-        garisBantu: [208, 224]
+        frekuensi: 98.00
     },
 
+    // Senar 5
     {
         nama: "A",
-        frekuensi: 110.00,
-        senar: 5,
-        fret: 0,
-
-        // Garis bantu ke-2
-        y: 208,
-
-        garisBantu: [208, 224]
+        frekuensi: 110.00
     },
 
     {
         nama: "B",
-        frekuensi: 123.47,
-        senar: 5,
-        fret: 2,
-
-        // Spasi antara garis bantu ke-1 dan ke-2
-        y: 192,
-
-        garisBantu: [208]
+        frekuensi: 123.47
     },
 
     {
         nama: "C",
-        frekuensi: 130.81,
-        senar: 5,
-        fret: 3,
-
-        // Garis bantu ke-1
-        y: 176,
-
-        garisBantu: [176]
+        frekuensi: 130.81
     },
 
     {
         nama: "D",
-        frekuensi: 146.83,
-        senar: 5,
-        fret: 5,
-
-        // Spasi tepat di bawah garis paranada
-        y: 160,
-
-        garisBantu: []
+        frekuensi: 146.83
     }
 
 ];
 
 
+// =====================================================
+// CANVAS
+// =====================================================
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+let target;
+
+
+// Menyimpan not sebelumnya
 let notSebelumnya = null;
 
 
-// ===============================
-// MEMILIH NOT ACAK
-// ===============================
+// =====================================================
+// PILIH NOT RANDOM
+// =====================================================
 
 function pilihNot() {
 
-    let notBaru;
+    let pilihan;
 
     do {
-        const index = Math.floor(Math.random() * nada.length);
-        notBaru = nada[index];
+
+        pilihan =
+            nada[
+                Math.floor(
+                    Math.random() * nada.length
+                )
+            ];
 
     } while (
         nada.length > 1 &&
-        notBaru.nama === notSebelumnya
+        pilihan.nama === notSebelumnya
     );
 
-    notSebelumnya = notBaru.nama;
+    target = pilihan;
 
-    gambarNot(notBaru);
+    notSebelumnya = target.nama;
+
+    gambarNot();
 }
 
 
-// ===============================
-// MENGGAMBAR NOT
-// ===============================
+// =====================================================
+// GAMBAR NOT
+// =====================================================
 
-function gambarNot(not) {
+function gambarNot() {
 
-    const group = document.getElementById("not");
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
 
-    // Hapus not sebelumnya
-    group.innerHTML = "";
 
-    const x = 500;
-    const y = not.y;
+    // -----------------------------
+    // PARANADA
+    // -----------------------------
 
-    // ===========================
-    // GARIS BANTU
-    // ===========================
+    const x1 = 100;
+    const x2 = 440;
 
-    not.garisBantu.forEach(function(gy) {
+    const jarak = 30;
 
-        const garis = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "line"
+    const garisTengah = 120;
+
+
+    for (
+        let i = -2;
+        i <= 2;
+        i++
+    ) {
+
+        const y =
+            garisTengah +
+            i * jarak;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x1,
+            y
         );
 
-        garis.setAttribute("x1", x - 30);
-        garis.setAttribute("x2", x + 30);
-        garis.setAttribute("y1", gy);
-        garis.setAttribute("y2", gy);
-        garis.setAttribute("class", "garis-bantu");
+        ctx.lineTo(
+            x2,
+            y
+        );
 
-        group.appendChild(garis);
-    });
+        ctx.strokeStyle = "black";
+
+        ctx.lineWidth = 3;
+
+        ctx.stroke();
+    }
 
 
-    // ===========================
+    // -----------------------------
+    // KUNCI G
+    // -----------------------------
+
+    ctx.font = "115px serif";
+
+    ctx.fillStyle = "black";
+
+    ctx.fillText(
+        "𝄞",
+        35,
+        155
+    );
+
+
+    // -----------------------------
+    // POSISI NOT
+    // -----------------------------
+    //
+    // Garis paranada:
+    //
+    // 60
+    // 90
+    // 120
+    // 150
+    // 180
+    //
+    // Jarak antar posisi not = 15 px
+    //
+    // D = spasi di bawah garis bawah
+    // C = garis bantu 1
+    // B = spasi di bawah C
+    // A = garis bantu 2
+    // G = spasi di bawah A
+    // F = garis bantu 3
+    // E = spasi di bawah F
+    // -----------------------------
+
+    const posisi = {
+
+        "D": 195,
+
+        "C": 210,
+
+        "B": 225,
+
+        "A": 240,
+
+        "G": 255,
+
+        "F": 270,
+
+        "E": 285
+
+    };
+
+
+    const y =
+        posisi[target.nama];
+
+    const x = 270;
+
+
+    // -----------------------------
+    // GARIS BANTU
+    // -----------------------------
+
+    // C = garis bantu 1
+    // A = garis bantu 2
+    // F = garis bantu 3
+
+    if (
+        target.nama === "C" ||
+        target.nama === "A" ||
+        target.nama === "F"
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x - 35,
+            y
+        );
+
+        ctx.lineTo(
+            x + 35,
+            y
+        );
+
+        ctx.strokeStyle = "black";
+
+        ctx.lineWidth = 3;
+
+        ctx.stroke();
+    }
+
+
+    // -----------------------------
     // KEPALA NOT
-    // ===========================
+    // -----------------------------
 
-    const kepala = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "ellipse"
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x,
+        y,
+        17,
+        12,
+        -0.3,
+        0,
+        Math.PI * 2
     );
 
-    kepala.setAttribute("cx", x);
-    kepala.setAttribute("cy", y);
-    kepala.setAttribute("rx", 14);
-    kepala.setAttribute("ry", 10);
-    kepala.setAttribute("class", "kepala-not");
-
-    // Sedikit dimiringkan seperti not asli
-    kepala.setAttribute(
-        "transform",
-        `rotate(-20 ${x} ${y})`
-    );
-
-    group.appendChild(kepala);
+    ctx.fill();
 
 
-    // ===========================
+    // -----------------------------
     // BATANG NOT
-    // ===========================
+    // -----------------------------
 
-    const batang = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line"
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x + 15,
+        y
     );
 
-    batang.setAttribute("x1", x + 11);
-    batang.setAttribute("x2", x + 11);
-    batang.setAttribute("y1", y);
-    batang.setAttribute("y2", y - 75);
-    batang.setAttribute("class", "batang-not");
+    ctx.lineTo(
+        x + 15,
+        y - 75
+    );
 
-    group.appendChild(batang);
+    ctx.lineWidth = 4;
+
+    ctx.stroke();
 }
 
 
-// ===============================
-// MIKROFON
-// ===============================
+// =====================================================
+// AUDIO
+// =====================================================
+
+let audioContext;
 
 let analyser;
-let dataArray;
 
-navigator.mediaDevices.getUserMedia({
-    audio: true
-})
-.then(function(stream) {
+let microphone;
 
-    const audioContext =
-        new (window.AudioContext ||
-             window.webkitAudioContext)();
-
-    const source =
-        audioContext.createMediaStreamSource(stream);
-
-    analyser = audioContext.createAnalyser();
-
-    analyser.fftSize = 4096;
-
-    source.connect(analyser);
-
-    dataArray =
-        new Float32Array(analyser.fftSize);
-
-    deteksiNada();
-
-})
-.catch(function(error) {
-
-    document.body.innerHTML =
-        "<h2>Izinkan akses mikrofon untuk menggunakan latihan ini.</h2>";
-
-});
+let buffer;
 
 
-// ===============================
-// DETEKSI FREKUENSI
-// ===============================
+async function mulaiMikrofon() {
 
-let waktuTerakhir = 0;
+    try {
+
+        const stream =
+            await navigator.mediaDevices
+            .getUserMedia({
+                audio: true
+            });
+
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+
+        microphone =
+            audioContext
+            .createMediaStreamSource(
+                stream
+            );
+
+
+        analyser =
+            audioContext
+            .createAnalyser();
+
+
+        analyser.fftSize = 4096;
+
+
+        microphone.connect(
+            analyser
+        );
+
+
+        buffer =
+            new Float32Array(
+                analyser.fftSize
+            );
+
+
+        deteksiNada();
+
+    }
+
+    catch (error) {
+
+        console.log(error);
+
+        document.body.innerHTML =
+            "<h2>Izinkan akses mikrofon</h2>";
+
+    }
+}
+
+
+// =====================================================
+// DETEKSI NADA
+// =====================================================
 
 function deteksiNada() {
 
-    requestAnimationFrame(deteksiNada);
-
-    if (!analyser) return;
-
-    analyser.getFloatTimeDomainData(dataArray);
-
-    // ---------------------------
-    // Hitung RMS
-    // ---------------------------
-
-    let jumlah = 0;
-
-    for (let i = 0; i < dataArray.length; i++) {
-        jumlah += dataArray[i] * dataArray[i];
-    }
-
-    const rms =
-        Math.sqrt(jumlah / dataArray.length);
-
-    // Abaikan suara terlalu kecil
-    if (rms < 0.015) {
-        return;
-    }
-
-
-    // ---------------------------
-    // Autocorrelation
-    // ---------------------------
-
-    let terbaik = 0;
-    let nilaiTerbaik = 0;
-
-    for (let offset = 20; offset < 1000; offset++) {
-
-        let korelasi = 0;
-
-        for (
-            let i = 0;
-            i < dataArray.length - offset;
-            i++
-        ) {
-            korelasi +=
-                dataArray[i] *
-                dataArray[i + offset];
-        }
-
-        if (korelasi > nilaiTerbaik) {
-
-            nilaiTerbaik = korelasi;
-            terbaik = offset;
-
-        }
-    }
-
-
-    if (terbaik === 0) {
-        return;
-    }
+    analyser.getFloatTimeDomainData(
+        buffer
+    );
 
 
     const frekuensi =
-        analyser.context.sampleRate / terbaik;
-
-
-    // ---------------------------
-    // Cari not terdekat
-    // ---------------------------
-
-    let notTerdekat = null;
-    let selisihTerkecil = Infinity;
-
-    nada.forEach(function(not) {
-
-        const selisih =
-            Math.abs(frekuensi - not.frekuensi);
-
-        if (selisih < selisihTerkecil) {
-
-            selisihTerkecil = selisih;
-            notTerdekat = not;
-
-        }
-    });
-
-
-    if (!notTerdekat) {
-        return;
-    }
-
-
-    // ---------------------------
-    // Toleransi 2,5%
-    // ---------------------------
-
-    const error =
-        Math.abs(
-            frekuensi - notTerdekat.frekuensi
-        ) / notTerdekat.frekuensi;
-
-
-    if (error > 0.025) {
-        return;
-    }
-
-
-    // ---------------------------
-    // Jangan membaca satu petikan
-    // berkali-kali
-    // ---------------------------
-
-    const sekarang = Date.now();
-
-    if (sekarang - waktuTerakhir < 500) {
-        return;
-    }
-
-
-    waktuTerakhir = sekarang;
-
-
-    // ---------------------------
-    // Cek jawaban
-    // ---------------------------
-
-    const notSekarang =
-        nada.find(function(n) {
-            return n.nama === notSebelumnya;
-        });
+        cariFrekuensi(
+            buffer,
+            audioContext.sampleRate
+        );
 
 
     if (
-        notSekarang &&
-        notTerdekat.nama === notSekarang.nama
+        frekuensi > 0
     ) {
 
-        // BENAR
-        // Langsung ganti not
-
-        pilihNot();
+        cekNada(frekuensi);
 
     }
 
+
+    requestAnimationFrame(
+        deteksiNada
+    );
 }
 
 
-// ===============================
-// MULAI DENGAN NOT ACAK
-// ===============================
+// =====================================================
+// CARI FREKUENSI
+// =====================================================
+
+function cariFrekuensi(
+    buffer,
+    sampleRate
+) {
+
+    let rms = 0;
+
+
+    for (
+        let i = 0;
+        i < buffer.length;
+        i++
+    ) {
+
+        rms +=
+            buffer[i] *
+            buffer[i];
+
+    }
+
+
+    rms =
+        Math.sqrt(
+            rms /
+            buffer.length
+        );
+
+
+    if (
+        rms < 0.015
+    ) {
+
+        return -1;
+
+    }
+
+
+    let bestOffset = -1;
+
+    let bestCorrelation = 0;
+
+
+    for (
+        let offset = 20;
+        offset < 1000;
+        offset++
+    ) {
+
+        let correlation = 0;
+
+
+        for (
+            let i = 0;
+            i < buffer.length - offset;
+            i++
+        ) {
+
+            correlation +=
+                buffer[i] *
+                buffer[i + offset];
+
+        }
+
+
+        correlation /=
+            buffer.length - offset;
+
+
+        if (
+            correlation >
+            bestCorrelation
+        ) {
+
+            bestCorrelation =
+                correlation;
+
+            bestOffset =
+                offset;
+
+        }
+    }
+
+
+    if (
+        bestOffset === -1
+    ) {
+
+        return -1;
+
+    }
+
+
+    return (
+        sampleRate /
+        bestOffset
+    );
+}
+
+
+// =====================================================
+// CEK NADA
+// =====================================================
+
+let waktuTerakhir = 0;
+
+
+function cekNada(freq) {
+
+    const sekarang =
+        Date.now();
+
+
+    // Mencegah satu petikan
+    // terbaca berkali-kali
+
+    if (
+        sekarang -
+        waktuTerakhir <
+        500
+    ) {
+
+        return;
+
+    }
+
+
+    let terdekat = null;
+
+    let selisihTerkecil =
+        Infinity;
+
+
+    for (
+        const n of nada
+    ) {
+
+        const selisih =
+            Math.abs(
+                freq -
+                n.frekuensi
+            );
+
+
+        if (
+            selisih <
+            selisihTerkecil
+        ) {
+
+            selisihTerkecil =
+                selisih;
+
+            terdekat = n;
+
+        }
+    }
+
+
+    // -----------------------------
+    // TOLERANSI 2,5%
+    // -----------------------------
+
+    if (
+        terdekat &&
+        selisihTerkecil /
+        terdekat.frekuensi <
+        0.025
+    ) {
+
+        waktuTerakhir =
+            sekarang;
+
+
+        // -------------------------
+        // JIKA BENAR
+        // -------------------------
+
+        if (
+            terdekat.nama ===
+            target.nama
+        ) {
+
+            pilihNot();
+
+        }
+
+
+        // -------------------------
+        // JIKA SALAH
+        // -------------------------
+
+        else {
+
+            // Not tetap ditampilkan.
+
+        }
+    }
+}
+
+
+// =====================================================
+// MULAI OTOMATIS
+// =====================================================
 
 pilihNot();
+
+mulaiMikrofon();
 
 </script>
 
